@@ -1,0 +1,575 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#064e3b">
+<title>Hausa Novels Reader</title>
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+
+<style>
+:root {
+    --bg:#f4f6fa;
+    --card:#fff;
+    --text:#172033;
+    --muted:#718096;
+    --primary:#087f5b;
+    --border:#e5eaf0;
+}
+body.dark {
+    --bg:#101827;
+    --card:#1b2638;
+    --text:#f1f5f9;
+    --muted:#a0aec0;
+    --border:#334155;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:Arial,sans-serif;background:var(--bg);color:var(--text)}
+header{background:linear-gradient(135deg,#064e3b,#087f5b);color:white;padding:30px 15px;text-align:center}
+header h1{font-size:26px;margin-bottom:8px}
+header p{font-size:14px;opacity:.9}
+.topbar{max-width:1100px;margin:15px auto;padding:0 15px;display:flex;gap:10px}
+.search-box{flex:1;position:relative}
+.search-box input{width:100%;padding:14px 42px;border:1px solid var(--border);border-radius:12px;outline:none;background:var(--card);color:var(--text);font-size:15px}
+.search-box i{position:absolute;left:15px;top:15px;color:var(--muted)}
+.icon-btn{border:1px solid var(--border);background:var(--card);color:var(--text);padding:13px 15px;border-radius:10px;cursor:pointer}
+.container{max-width:1100px;margin:auto;padding:10px 15px 40px}
+.section-heading{display:flex;justify-content:space-between;align-items:center;margin:25px 0 15px}
+.section-heading h2{font-size:20px}
+.count{color:var(--muted);font-size:13px}
+.book-grid,.offer-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:15px}
+.book-card,.offer-card{background:var(--card);border:1px solid var(--border);border-radius:15px;padding:18px;transition:.2s;overflow:hidden}
+.book-card:hover,.offer-card:hover{transform:translateY(-3px);box-shadow:0 8px 25px #00000012}
+.book-icon{width:55px;height:55px;display:flex;align-items:center;justify-content:center;background:#d1fae5;color:#047857;border-radius:14px;font-size:24px;margin-bottom:15px}
+.book-card h3,.offer-card h3{font-size:16px;margin-bottom:10px;overflow-wrap:anywhere}
+.book-card p,.offer-card p{color:var(--muted);font-size:13px;margin-bottom:15px;line-height:1.6}
+.read-btn,.offer-btn{display:block;width:100%;padding:12px;border:none;border-radius:9px;background:var(--primary);color:white;font-weight:bold;text-align:center;text-decoration:none;cursor:pointer}
+.offer-label{display:inline-block;background:#dcfce7;color:#166534;padding:5px 9px;border-radius:20px;font-size:11px;font-weight:bold;margin-bottom:12px}
+.offer-image{width:55px;height:55px;object-fit:contain;border-radius:12px;margin-bottom:12px;background:#f1f5f9;padding:5px}
+.status{background:var(--card);border:1px solid var(--border);padding:20px;text-align:center;border-radius:12px;color:var(--muted);grid-column:1/-1}
+.continue-card{display:none;background:var(--card);border:1px solid var(--border);border-left:4px solid var(--primary);border-radius:13px;padding:18px;margin:20px 0}
+.continue-card h3{margin-bottom:8px}
+.continue-card p{color:var(--muted);font-size:13px;margin-bottom:12px}
+.continue-btn{background:var(--primary);color:white;border:0;border-radius:8px;padding:11px 16px;font-weight:bold;cursor:pointer}
+.progress-track{height:7px;background:var(--border);border-radius:20px;margin:12px 0;overflow:hidden}
+.progress-fill{height:100%;width:0;background:var(--primary);border-radius:20px}
+.reader{display:none;position:fixed;inset:0;z-index:1000;background:var(--bg);overflow-y:auto}
+.reader-header{position:sticky;top:0;z-index:2;background:#064e3b;color:white;padding:15px;display:flex;justify-content:space-between;align-items:center;gap:10px}
+.reader-header h2{font-size:17px;overflow-wrap:anywhere}
+.reader-header button{background:#ffffff20;color:white;border:1px solid #ffffff40;padding:9px 12px;border-radius:8px;cursor:pointer}
+.reader-tools{max-width:850px;margin:15px auto;padding:0 15px;display:flex;justify-content:flex-end;gap:10px}
+.reader-tools button{background:var(--card);color:var(--text);border:1px solid var(--border);padding:9px 14px;border-radius:8px;cursor:pointer}
+.reader-progress{position:sticky;top:56px;height:4px;background:#ffffff30;z-index:3}
+.reader-progress div{height:100%;width:0;background:#a7f3d0}
+.reader-body{max-width:850px;margin:15px auto 30px;padding:25px;background:var(--card);border-radius:12px;line-height:2;white-space:pre-wrap;overflow-wrap:anywhere;font-size:18px}
+footer{text-align:center;padding:25px;color:var(--muted);font-size:13px}
+@media(max-width:600px){
+header h1{font-size:22px}
+.book-grid,.offer-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.book-card,.offer-card{padding:13px}
+.book-card h3,.offer-card h3{font-size:14px}
+.reader-body{margin:12px;padding:18px;font-size:17px}
+}
+</style>
+</head>
+
+<body>
+
+<header>
+    <h1><i class="fas fa-book-open"></i> Hausa Novels</h1>
+    <p>Read Your Favourite Hausa Novels Anytime</p>
+</header>
+
+<div class="topbar">
+    <div class="search-box">
+        <i class="fas fa-search"></i>
+        <input type="search" id="searchInput" placeholder="Search novels..." oninput="renderBooks()">
+    </div>
+    <button class="icon-btn" onclick="toggleDarkMode()" title="Toggle theme">
+        <i class="fas fa-moon"></i>
+    </button>
+</div>
+
+<main class="container">
+
+    <section class="continue-card" id="continueCard">
+        <h3><i class="fas fa-history"></i> Continue Reading</h3>
+        <p id="continueTitle"></p>
+        <div class="progress-track">
+            <div class="progress-fill" id="continueProgress"></div>
+        </div>
+        <p id="continuePercent"></p>
+        <button class="continue-btn" onclick="continueReading()">
+            <i class="fas fa-book-reader"></i> Continue Reading
+        </button>
+    </section>
+
+    <section>
+        <div class="section-heading">
+            <h2>All Novels</h2>
+            <span class="count" id="novelCount">Loading...</span>
+        </div>
+        <div class="book-grid" id="bookList">
+            <div class="status"><i class="fas fa-spinner fa-spin"></i> Loading novels...</div>
+        </div>
+    </section>
+
+    <section id="offersSection">
+        <div class="section-heading">
+            <h2><i class="fas fa-gift"></i> Recommended Offers</h2>
+            <span class="count" id="offerCount">Loading...</span>
+        </div>
+        <div class="offer-grid" id="offerList">
+            <div class="status"><i class="fas fa-spinner fa-spin"></i> Loading offers...</div>
+        </div>
+    </section>
+
+</main>
+
+<footer>
+    © <span id="year"></span> Hausa Novels. All Rights Reserved.
+</footer>
+
+<div class="reader" id="reader">
+
+    <div class="reader-header">
+        <h2 id="readerTitle">Novel Title</h2>
+        <button onclick="closeReader()" title="Close reader">
+            <i class="fas fa-times"></i>
+        </button>
+    </div>
+
+    <div class="reader-progress">
+        <div id="readerProgress"></div>
+    </div>
+
+    <div class="reader-tools">
+        <button onclick="changeFont(-1)" title="Decrease font"><i class="fas fa-minus"></i></button>
+        <button onclick="changeFont(1)" title="Increase font"><i class="fas fa-plus"></i></button>
+    </div>
+
+    <div class="reader-body" id="bookContent"></div>
+
+</div>
+
+<script>
+
+/* NOVEL FILES */
+
+const NOVEL_FILES = [
+    "NADIYA.txt",
+    "GWAJIN DAFI.txt",
+    "SIRRIN SO.txt"
+];
+
+/* OFFERS API */
+
+const OFFER_API =
+"https://d3r33tlb373kwk.cloudfront.net/public/offers/feed.php?user_id=815457&api_key=376e7fe38ff33269d849fc84b9079cb4&s1=&s2=";
+
+/* VARIABLES */
+
+let loadedNovels = [];
+let loadedOffers = [];
+let currentNovel = null;
+let currentFontSize = 18;
+
+const SAVE_KEY = "hausaNovelReadingProgress";
+
+/* LOAD SAVED PROGRESS */
+
+function getSavedProgress() {
+    try {
+        return JSON.parse(localStorage.getItem(SAVE_KEY)) || {};
+    } catch {
+        return {};
+    }
+}
+
+function saveProgress(data) {
+    localStorage.setItem(SAVE_KEY, JSON.stringify(data));
+}
+
+/* LOAD NOVELS */
+
+async function loadNovels() {
+
+    const bookList = document.getElementById("bookList");
+
+    bookList.innerHTML = `
+        <div class="status">
+            <i class="fas fa-spinner fa-spin"></i> Loading novels...
+        </div>
+    `;
+
+    const results = await Promise.all(
+        NOVEL_FILES.map(async file => {
+            try {
+                const response = await fetch(
+                    encodeURIComponent(file) + "?t=" + Date.now()
+                );
+
+                if (!response.ok) {
+                    throw new Error("HTTP " + response.status);
+                }
+
+                const content = await response.text();
+
+                return {
+                    title: file.replace(/\.txt$/i, ""),
+                    filename: file,
+                    content,
+                    success: true
+                };
+
+            } catch (error) {
+                console.error("Unable to load:", file, error);
+                return {
+                    title: file.replace(/\.txt$/i, ""),
+                    filename: file,
+                    success: false
+                };
+            }
+        })
+    );
+
+    loadedNovels = results.filter(book => book.success);
+
+    renderBooks();
+    updateContinueCard();
+}
+
+/* DISPLAY NOVELS */
+
+function renderBooks() {
+
+    const bookList = document.getElementById("bookList");
+    const search = document.getElementById("searchInput").value.toLowerCase().trim();
+
+    const filtered = loadedNovels.filter(book =>
+        book.title.toLowerCase().includes(search)
+    );
+
+    document.getElementById("novelCount").textContent =
+        loadedNovels.length + " novels";
+
+    if (!filtered.length) {
+        bookList.innerHTML = `
+            <div class="status">No novels found.</div>
+        `;
+        return;
+    }
+
+    bookList.innerHTML = "";
+
+    filtered.forEach(book => {
+
+        const index = loadedNovels.indexOf(book);
+        const card = document.createElement("div");
+        card.className = "book-card";
+
+        const icon = document.createElement("div");
+        icon.className = "book-icon";
+        icon.innerHTML = '<i class="fas fa-book"></i>';
+
+        const title = document.createElement("h3");
+        title.textContent = book.title;
+
+        const desc = document.createElement("p");
+        desc.textContent = book.content.length + " characters";
+
+        const button = document.createElement("button");
+        button.className = "read-btn";
+        button.innerHTML = '<i class="fas fa-book-open"></i> Read Novel';
+        button.addEventListener("click", () => openNovel(index, false));
+
+        card.append(icon, title, desc, button);
+        bookList.appendChild(card);
+    });
+}
+
+/* LOAD OFFERS */
+
+async function loadOffers() {
+
+    const offerList = document.getElementById("offerList");
+
+    try {
+        const response = await fetch(OFFER_API + "&t=" + Date.now());
+
+        if (!response.ok) throw new Error("HTTP " + response.status);
+
+        const data = await response.json();
+
+        let offers = [];
+
+        if (Array.isArray(data)) offers = data;
+        else if (Array.isArray(data.offers)) offers = data.offers;
+        else if (Array.isArray(data.data)) offers = data.data;
+
+        loadedOffers = offers.filter(offer =>
+            offer && (offer.name || offer.title || offer.anchor) &&
+            (offer.url || offer.link || offer.offer_url)
+        );
+
+        renderOffers();
+
+    } catch (error) {
+        console.error("Offer loading error:", error);
+        document.getElementById("offerCount").textContent = "Unavailable";
+        offerList.innerHTML = `
+            <div class="status">Offers are temporarily unavailable.</div>
+        `;
+    }
+}
+
+/* DISPLAY OFFERS */
+
+function renderOffers() {
+
+    const offerList = document.getElementById("offerList");
+
+    document.getElementById("offerCount").textContent =
+        loadedOffers.length + " offers";
+
+    offerList.innerHTML = "";
+
+    if (!loadedOffers.length) {
+        offerList.innerHTML = `<div class="status">No offers available right now.</div>`;
+        return;
+    }
+
+    loadedOffers.forEach(offer => {
+
+        const name = offer.name || offer.title || offer.anchor || "Special Offer";
+        const description = offer.description || offer.conversion || "Discover this special offer and learn more.";
+        const image = offer.network_icon || offer.image || offer.icon || "";
+        const url = offer.url || offer.link || offer.offer_url;
+
+        const card = document.createElement("div");
+        card.className = "offer-card";
+
+        const label = document.createElement("span");
+        label.className = "offer-label";
+        label.textContent = "SPECIAL OFFER";
+
+        card.appendChild(label);
+
+        if (image) {
+            const img = document.createElement("img");
+            img.className = "offer-image";
+            img.src = image;
+            img.alt = name;
+            img.loading = "lazy";
+            img.onerror = () => img.remove();
+            card.appendChild(img);
+        } else {
+            const icon = document.createElement("div");
+            icon.className = "book-icon";
+            icon.innerHTML = '<i class="fas fa-gift"></i>';
+            card.appendChild(icon);
+        }
+
+        const title = document.createElement("h3");
+        title.textContent = name;
+
+        const desc = document.createElement("p");
+        desc.textContent = description;
+
+        const button = document.createElement("a");
+        button.className = "offer-btn";
+        button.href = url;
+        button.target = "_blank";
+        button.rel = "nofollow sponsored noopener noreferrer";
+        button.textContent = "View Offer";
+
+        card.append(title, desc, button);
+        offerList.appendChild(card);
+    });
+}
+
+/* OPEN NOVEL */
+
+function openNovel(index, resume = false) {
+
+    const novel = loadedNovels[index];
+    if (!novel) return;
+
+    currentNovel = novel;
+
+    document.getElementById("readerTitle").textContent = novel.title;
+
+    const content = document.getElementById("bookContent");
+    content.textContent = novel.content;
+
+    document.getElementById("reader").style.display = "block";
+    document.body.style.overflow = "hidden";
+
+    currentFontSize = 18;
+    updateFontSize();
+
+    requestAnimationFrame(() => {
+        const saved = getSavedProgress();
+        const position = resume && saved[novel.filename]
+            ? saved[novel.filename].position || 0
+            : 0;
+
+        document.getElementById("reader").scrollTop = position;
+        updateReaderProgress();
+    });
+}
+
+/* SAVE CURRENT READING POSITION */
+
+function updateReaderProgress() {
+
+    if (!currentNovel) return;
+
+    const reader = document.getElementById("reader");
+    const content = document.getElementById("bookContent");
+
+    const maxScroll = reader.scrollHeight - reader.clientHeight;
+
+    const position = reader.scrollTop;
+
+    const percentage = maxScroll > 0
+        ? Math.min(100, Math.round((position / maxScroll) * 100))
+        : 0;
+
+    document.getElementById("readerProgress").style.width =
+        percentage + "%";
+
+    const saved = getSavedProgress();
+
+    saved[currentNovel.filename] = {
+        title: currentNovel.title,
+        position: position,
+        percentage: percentage,
+        updated: Date.now()
+    };
+
+    saved.lastNovel = currentNovel.filename;
+
+    saveProgress(saved);
+
+    updateContinueCard();
+}
+
+/* CONTINUE CARD */
+
+function updateContinueCard() {
+
+    const saved = getSavedProgress();
+    const lastFile = saved.lastNovel;
+
+    const card = document.getElementById("continueCard");
+
+    if (!lastFile || !saved[lastFile]) {
+        card.style.display = "none";
+        return;
+    }
+
+    const novel = loadedNovels.find(book => book.filename === lastFile);
+
+    if (!novel) {
+        card.style.display = "none";
+        return;
+    }
+
+    const progress = saved[lastFile].percentage || 0;
+
+    card.style.display = "block";
+
+    document.getElementById("continueTitle").textContent =
+        novel.title;
+
+    document.getElementById("continueProgress").style.width =
+        progress + "%";
+
+    document.getElementById("continuePercent").textContent =
+        progress + "% completed";
+}
+
+/* CONTINUE READING */
+
+function continueReading() {
+
+    const saved = getSavedProgress();
+    const lastFile = saved.lastNovel;
+
+    const index = loadedNovels.findIndex(
+        book => book.filename === lastFile
+    );
+
+    if (index !== -1) {
+        openNovel(index, true);
+    }
+}
+
+/* SAVE WHILE SCROLLING */
+
+document.getElementById("reader").addEventListener(
+    "scroll",
+    updateReaderProgress,
+    { passive: true }
+);
+
+/* CLOSE READER */
+
+function closeReader() {
+    updateReaderProgress();
+    document.getElementById("reader").style.display = "none";
+    document.body.style.overflow = "auto";
+}
+
+/* FONT SIZE */
+
+function changeFont(amount) {
+    currentFontSize += amount;
+    currentFontSize = Math.max(12, Math.min(32, currentFontSize));
+    updateFontSize();
+}
+
+function updateFontSize() {
+    document.getElementById("bookContent").style.fontSize =
+        currentFontSize + "px";
+}
+
+/* DARK MODE */
+
+function toggleDarkMode() {
+
+    document.body.classList.toggle("dark");
+
+    const icon = document.querySelector(".icon-btn i");
+
+    if (document.body.classList.contains("dark")) {
+        icon.className = "fas fa-sun";
+        localStorage.setItem("novelTheme", "dark");
+    } else {
+        icon.className = "fas fa-moon";
+        localStorage.setItem("novelTheme", "light");
+    }
+}
+
+if (localStorage.getItem("novelTheme") === "dark") {
+    document.body.classList.add("dark");
+    document.querySelector(".icon-btn i").className = "fas fa-sun";
+}
+
+/* YEAR */
+
+document.getElementById("year").textContent =
+    new Date().getFullYear();
+
+/* START */
+
+loadNovels();
+loadOffers();
+
+</script>
+
+</body>
+</html>
